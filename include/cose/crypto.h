@@ -32,6 +32,9 @@
 #ifdef CRYPTO_SODIUM
 #include "cose/crypto/sodium.h"
 #endif
+#ifdef CRYPTO_TC_AES
+#include "cose/crypto/tc_aes.h"
+#endif
 #if defined(CRYPTO_MONOCYPHER)
 #include "cose/crypto/monocypher.h"
 #endif
@@ -150,6 +153,9 @@ extern "C" {
 #define COSE_CRYPTO_AEAD_AES256GCM_NONCEBYTES   COSE_CRYPTO_AEAD_AESGCM_NONCEBYTES
 #define COSE_CRYPTO_AEAD_AES256GCM_ABYTES       COSE_CRYPTO_AEAD_AESGCM_ABYTES
 
+#define COSE_CRYPTO_AEAD_AES128CCM_KEYBYTES     16
+#define COSE_CRYPTO_AEAD_AES128CCM_NONCEBYTES   13
+#define COSE_CRYPTO_AEAD_AES128CCM_ABYTES       8
 
 /** @} */
 
@@ -233,11 +239,32 @@ int cose_crypto_aead_decrypt_aesgcm(uint8_t *msg,
                                     const uint8_t *k,
                                     size_t keysize);
 
+int cose_crypto_aead_encrypt_aesccm(uint8_t *c,
+                                    size_t *clen,
+                                    const uint8_t *msg,
+                                    size_t msglen,
+                                    const uint8_t *aad,
+                                    size_t aadlen,
+                                    const uint8_t *npub,
+                                    const uint8_t *k,
+                                    size_t keysize);
+
+int cose_crypto_aead_decrypt_aesccm(uint8_t *msg,
+                                    size_t *msglen,
+                                    const uint8_t *c,
+                                    size_t clen,
+                                    const uint8_t *aad,
+                                    size_t aadlen,
+                                    const uint8_t *npub,
+                                    const uint8_t *k,
+                                    size_t keysize);
+
 /**
  * Generate a symmetric key for AEAD operations
  */
 COSE_ssize_t cose_crypto_keygen_chachapoly(uint8_t *sk, size_t len);
 COSE_ssize_t cose_crypto_keygen_aesgcm(uint8_t *buf, size_t len, cose_algo_t algo);
+COSE_ssize_t cose_crypto_keygen_aesccm(uint8_t *buf, size_t len, cose_algo_t algo);
 size_t cose_crypto_aead_nonce_chachapoly(uint8_t *nonce, size_t len);
 COSE_ssize_t cose_crypto_aead_nonce_size(cose_algo_t algo);
 

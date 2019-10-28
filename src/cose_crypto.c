@@ -36,6 +36,10 @@ COSE_ssize_t cose_crypto_keygen(uint8_t *buf, /* NOLINT(readability-non-const-pa
         case COSE_ALGO_A256GCM:
             return cose_crypto_keygen_aesgcm(buf, len, algo);
 #endif
+#if defined(HAVE_ALGO_AES128CCM)
+        case COSE_ALGO_A128CCM:
+            return cose_crypto_keygen_aesccm(buf, len, algo);
+#endif
         default:
             (void)buf;
             (void)len;
@@ -48,6 +52,7 @@ bool cose_crypto_is_aead(cose_algo_t algo)
     /* NOLINTNEXTLINE(hicpp-multiway-paths-covered) */
     switch(algo) {
         case COSE_ALGO_CHACHA20POLY1305:
+        case COSE_ALGO_A128CCM:
             return true;
         default:
             return false;
@@ -82,6 +87,10 @@ int cose_crypto_aead_encrypt(uint8_t *c,  /* NOLINT(readability-non-const-parame
 #ifdef HAVE_ALGO_AES128GCM
         case COSE_ALGO_A128GCM:
             return cose_crypto_aead_encrypt_aesgcm(c, clen, msg, msglen, aad, aadlen, npub, key, COSE_CRYPTO_AEAD_AES128GCM_KEYBYTES);
+#endif
+#ifdef HAVE_ALGO_AES128CCM
+        case COSE_ALGO_A128CCM:
+            return cose_crypto_aead_encrypt_aesccm(c, clen, msg, msglen, aad, aadlen, npub, key, COSE_CRYPTO_AEAD_AES128CCM_KEYBYTES);
 #endif
         default:
             (void)c;
@@ -125,6 +134,10 @@ int cose_crypto_aead_decrypt(uint8_t *msg, /* NOLINT(readability-non-const-param
         case COSE_ALGO_A128GCM:
             return cose_crypto_aead_decrypt_aesgcm(msg, msglen, c, clen, aad, aadlen, npub, k, COSE_CRYPTO_AEAD_AES128GCM_KEYBYTES);
 #endif
+#ifdef HAVE_ALGO_AES128CCM
+        case COSE_ALGO_A128CCM:
+            return cose_crypto_aead_decrypt_aesccm(msg, msglen, c, clen, aad, aadlen, npub, k, COSE_CRYPTO_AEAD_AES128CCM_KEYBYTES);
+#endif
         default:
             (void)c;
             (void)clen;
@@ -146,6 +159,10 @@ COSE_ssize_t cose_crypto_aead_nonce_size(cose_algo_t algo)
         case COSE_ALGO_CHACHA20POLY1305:
             return COSE_CRYPTO_AEAD_CHACHA20POLY1305_NONCEBYTES;
 #endif /* HAVE_ALGO_CHACHA20POLY1305 */
+#ifdef HAVE_ALGO_AES128CCM
+        case COSE_ALGO_A128CCM:
+            return COSE_CRYPTO_AEAD_AES128CCM_NONCEBYTES;
+#endif /* HAVE_ALGO_AES128CCM */
         default:
             return COSE_ERR_NOTIMPLEMENTED;
     }

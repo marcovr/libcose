@@ -2,7 +2,7 @@ CBOR_ROOT ?= $(PWD)/../cn-cbor/
 TINYCBOR_ROOT ?= $(PWD)/../tinycbor/
 NANOCBOR_ROOT ?= $(PWD)/../nanocbor/
 INC_GLOBAL ?= /usr/include
-CRYPTO ?= sodium
+CRYPTO ?= sodium tc_aes
 
 CC ?= gcc
 RM=rm -rf
@@ -37,6 +37,9 @@ CFLAGS += -fPIC $(CFLAGS_WARN) -I$(INC_DIR) -I$(INC_GLOBAL) -I$(INC_TINYCBOR) -I
 ifneq (,$(filter sodium,$(CRYPTO)))
 	include $(MK_DIR)/sodium.mk
 endif
+ifneq (,$(filter tc_aes,$(CRYPTO)))
+	include $(MK_DIR)/tc_aes.mk
+endif
 ifneq (,$(filter monocypher,$(CRYPTO)))
 	include $(MK_DIR)/monocypher.mk
 endif
@@ -69,6 +72,8 @@ LDFLAGS += $(LDFLAGS_CRYPTO)
 
 lib: $(BIN_DIR)/libcose.so
 
+aes-test: $(BIN_DIR)/aes-test
+
 prepare:
 	@mkdir -p $(OBJ_DIR)
 	@mkdir -p $(OBJ_DIR)/crypt
@@ -88,6 +93,9 @@ $(BIN_DIR)/test: $(OBJS) $(OTESTS) prepare
 
 $(BIN_DIR)/libcose.so: $(OBJS) prepare
 	$(CC) $(CFLAGS) $(OBJS) -o $@ -Wl,$(LIB_NANOCBOR)  -shared
+
+$(BIN_DIR)/aes-test: $(OBJS) $(OBJ_DIR)/tests/aes.o prepare
+	$(CC) $(CFLAGS) $(OBJS) $(OBJ_DIR)/tests/aes.o -o $@ -Wl,$(LIB_NANOCBOR) -lsodium
 
 test: $(BIN_DIR)/test
 	LD_LIBRARY_PATH=$(LIB_TINYCBOR_PATH) $<
