@@ -1,6 +1,7 @@
 # libcose
 
-[![Build Status](https://api.cirrus-ci.com/github/bergzand/libcose.svg)](https://cirrus-ci.com/github/bergzand/libcose)
+This is an adapted version of libcose which also supports AES-CCM & HMAC256 in
+order to be used with OSCORE & EDHOC.
 
 Libcose is a C library aiming to implement the full [COSE] standard.
 Libcose is aimed at constrained devices without dynamic memory allocation,
