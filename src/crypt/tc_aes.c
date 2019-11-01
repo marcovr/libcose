@@ -76,18 +76,18 @@ static __m128i aes_128_key_expansion(__m128i key, __m128i keygened){
 }
 
 //public API
-void aes128_load_key(const uint8_t *enc_key, __m128i *key_schedule){
-    key_schedule[0] = _mm_loadu_si128((const __m128i*) enc_key);
-    key_schedule[1]  = AES_128_key_exp(key_schedule[0], 0x01);
-    key_schedule[2]  = AES_128_key_exp(key_schedule[1], 0x02);
-    key_schedule[3]  = AES_128_key_exp(key_schedule[2], 0x04);
-    key_schedule[4]  = AES_128_key_exp(key_schedule[3], 0x08);
-    key_schedule[5]  = AES_128_key_exp(key_schedule[4], 0x10);
-    key_schedule[6]  = AES_128_key_exp(key_schedule[5], 0x20);
-    key_schedule[7]  = AES_128_key_exp(key_schedule[6], 0x40);
-    key_schedule[8]  = AES_128_key_exp(key_schedule[7], 0x80);
-    key_schedule[9]  = AES_128_key_exp(key_schedule[8], 0x1B);
-    key_schedule[10] = AES_128_key_exp(key_schedule[9], 0x36);
+void aes128_load_key(const uint8_t *enc_key, key_schedule_t *key_schedule){
+    (*key_schedule)[0] = _mm_loadu_si128((const __m128i*) enc_key);
+    (*key_schedule)[1]  = AES_128_key_exp((*key_schedule)[0], 0x01);
+    (*key_schedule)[2]  = AES_128_key_exp((*key_schedule)[1], 0x02);
+    (*key_schedule)[3]  = AES_128_key_exp((*key_schedule)[2], 0x04);
+    (*key_schedule)[4]  = AES_128_key_exp((*key_schedule)[3], 0x08);
+    (*key_schedule)[5]  = AES_128_key_exp((*key_schedule)[4], 0x10);
+    (*key_schedule)[6]  = AES_128_key_exp((*key_schedule)[5], 0x20);
+    (*key_schedule)[7]  = AES_128_key_exp((*key_schedule)[6], 0x40);
+    (*key_schedule)[8]  = AES_128_key_exp((*key_schedule)[7], 0x80);
+    (*key_schedule)[9]  = AES_128_key_exp((*key_schedule)[8], 0x1B);
+    (*key_schedule)[10] = AES_128_key_exp((*key_schedule)[9], 0x36);
 }
 
 void aes128_enc(uint8_t *plainText, uint8_t *cipherText, __m128i *key_schedule){
@@ -351,7 +351,7 @@ int cose_crypto_aead_encrypt_aesccm(uint8_t *c,
 
     struct tc_ccm_mode_struct tc_c;
     key_schedule_t sched;
-    aes128_load_key(k, sched);
+    aes128_load_key(k, &sched);
 
     int result = tc_ccm_config(&tc_c, &sched, (uint8_t *)npub,
             COSE_CRYPTO_AEAD_AES128CCM_NONCEBYTES,
@@ -386,7 +386,7 @@ int cose_crypto_aead_decrypt_aesccm(uint8_t *msg,
 
     struct tc_ccm_mode_struct tc_c;
     key_schedule_t sched;
-    aes128_load_key(k, sched);
+    aes128_load_key(k, &sched);
 
     int result = tc_ccm_config(&tc_c, &sched, (uint8_t *)npub,
             COSE_CRYPTO_AEAD_AES128CCM_NONCEBYTES,
